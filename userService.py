@@ -78,7 +78,11 @@ def get_paginated_user_data(page, per_page):
             cursor.execute(sql)
             result = cursor.fetchall()
             user_list = list(result)
-            return user_list
+
+            cursor.execute("SELECT COUNT(*) FROM user_table")
+            total_records = cursor.fetchone()['COUNT(*)']
+
+            return user_list, total_records
     finally:
         connection.close()
 

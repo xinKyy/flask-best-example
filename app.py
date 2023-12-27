@@ -18,7 +18,7 @@ db_config = {
 app = Flask(__name__)
 
 
-def create_response(result, result_code=200, result_message="请求成功"):
+def create_response(result, result_code=200, result_message="successfully"):
     response = {
         "result": result,
         "resultCode": result_code,
@@ -27,8 +27,8 @@ def create_response(result, result_code=200, result_message="请求成功"):
     return jsonify(response)
 
 
-@app.route('/addUser', methods=['POST'])
-def add_user():
+@app.route('/add_user', methods=['POST'])
+def add_user_route():
     # data = request.form
     data = request.get_json()
     name = data.get('name')
@@ -37,17 +37,7 @@ def add_user():
     response = create_response(True)
     return response
 
-
-@app.route('/delUser', methods=['POST'])
-def del_user():
-    # data = request.form
-    data = request.get_json()
-    id = data.get('id')
-    delete_user(id)
-    response = create_response(True)
-    return response
-
-@app.route('/saveUser', methods=['POST'])
+@app.route('/edit_user', methods=['POST'])
 def save_user():
     data = request.get_json()
     id = data.get('id')
@@ -57,26 +47,21 @@ def save_user():
     response = create_response(True)
     return response
 
-@app.route("/getUserList")
-def get_user_list():
-    response = create_response(get_user_data())
-    return response
 
-
-@app.route('/getUsers', methods=['GET'])
+@app.route('/get_user_list', methods=['GET'])
 def get_paginated_users():
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 10))
+    page = int(request.args.get('page_num', 1))
+    page_size = int(request.args.get('page_size', 10))
 
-    user_data = get_paginated_user_data(page, per_page)
+    user_data, total_records = get_paginated_user_data(page, page_size)
 
-    response = {
+    response_data = {
         'records': user_data,
-        'current':page,
-        'total':len(user_data),
+        'current': page,
+        'total': total_records,
     }
-
-    return jsonify(response)
+    res = create_response(response_data)
+    return res
 
 
 @app.route('/')
